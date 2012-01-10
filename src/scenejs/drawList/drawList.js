@@ -789,7 +789,7 @@ var SceneJS_DrawList = new (function() {
 
         /* Identify what GLSL is required for the current state soup elements
          */
-        if (!this._stateHash || oldGeoHash != geoState.hash)) {
+        if (!this._stateHash || oldGeoHash != geoState.hash) {
             this._stateHash = this._getSceneHash();
         }
 
