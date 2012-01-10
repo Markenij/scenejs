@@ -294,6 +294,10 @@ new (function() {
         return this._stream;
     };
 
+    SceneJS_geometry.prototype.getLoaded = function () {
+        return this._getArrays() != null;
+    };
+
     SceneJS_geometry.prototype.getPositions = function() {
         return this._getArrays().positions;
     };
