@@ -549,19 +549,19 @@ new (function() {
         } : undefined;
     };
 
-    Renderer.prototype.setClear = function(clear) {
-        this.core.clear = clear ? {
+    Renderer.prototype.setClearColor = function (clear) {
+        this.core.clearColor = clear ? {
             r : clear.r || 0,
             g : clear.g || 0,
             b : clear.b || 0
         } : undefined;
     };
 
-    Renderer.prototype.getClear = function() {
-        return this.core.clear ? {
-            r : this.core.clear.r,
-            g : this.core.clear.g,
-            b : this.core.clear.b
+    Renderer.prototype.getClearColor = function () {
+        return this.core.clearColor ? {
+            r : this.core.clearColor.r,
+            g : this.core.clearColor.g,
+            b : this.core.clearColor.b
         } : null;
     };
 
