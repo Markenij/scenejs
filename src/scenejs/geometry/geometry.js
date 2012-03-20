@@ -362,7 +362,12 @@ new (function() {
         return this._getArrays().colors;
     };
 
-    SceneJS_geometry.prototype.setColors = function(params) {
+    SceneJS_geometry.prototype.setColors = function (params) {
+        if (!this.core.colorBuf) {
+            var context = this.scene.canvas.context;
+            var usage = context.STATIC_DRAW;
+            this.core.colorBuf = new SceneJS_webgl_ArrayBuffer(context, context.ARRAY_BUFFER, params.colors, params.colors.length, 4, usage);
+        }
         this.core.colorBuf.bind();
         this.core.colorBuf.setData(params.colors, params.offset || 0);
     };
