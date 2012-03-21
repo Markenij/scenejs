@@ -464,7 +464,8 @@ new (function() {
     };
 
     SceneJS_geometry.prototype._destroy = function() {
-        if (this.core._nodeCount == 1) { // Last core user
+        if (this.core._nodeCount == 1 &&     // Last core user
+            !this.core._loading) {           // and loaded already
             destroyGeometry(this.core);
 
             /* When destroying scene nodes, we only need to notify the rendering module
