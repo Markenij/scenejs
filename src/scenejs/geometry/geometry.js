@@ -363,13 +363,20 @@ new (function() {
     };
 
     SceneJS_geometry.prototype.setColors = function (params) {
-        if (!this.core.colorBuf) {
-            var context = this.scene.canvas.context;
-            var usage = context.STATIC_DRAW;
-            this.core.colorBuf = new SceneJS_webgl_ArrayBuffer(context, context.ARRAY_BUFFER, params.colors, params.colors.length, 4, usage);
+        if (params && params.colors) {
+            if (!this.core.colorBuf) {
+                var context = this.scene.canvas.context;
+                var usage = context.STATIC_DRAW;
+                this.core.colorBuf = new SceneJS_webgl_ArrayBuffer(context, context.ARRAY_BUFFER, params.colors, params.colors.length, 4, usage);
+            }
+            this.core.colorBuf.bind();
+            this.core.colorBuf.setData(params.colors, params.offset || 0);
         }
-        this.core.colorBuf.bind();
-        this.core.colorBuf.setData(params.colors, params.offset || 0);
+        else if (this.core.colorBuf) {
+            this.core.colorBuf.unbind();
+            this.core.colorBuf.destroy();
+            delete this.core.colorBuf;
+        }
     };
 
     SceneJS_geometry.prototype.getIndices = function() {
