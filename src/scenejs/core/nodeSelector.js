@@ -154,6 +154,12 @@
         return this._targetNode.children.length;
     };
 
+    /** Returns number of references which exist for the core of this node
+     */
+    NodeSelector.prototype.numCoreReferences = function () {
+        return this._targetNode.core._nodeCount;
+    };
+
     /** Sets an attribute of the selected node
      */
     NodeSelector.prototype.set = function(attr, value) {
