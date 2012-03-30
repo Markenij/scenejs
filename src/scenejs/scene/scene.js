@@ -150,6 +150,10 @@ new (function() {
             throw SceneJS_errorModule.fatalError(SceneJS.errors.ILLEGAL_NODE_CONFIG, "Scene canvasId expected");
         }
 
+        if (params.loggingElementId === false) {
+            SceneJS_loggingModule.off();
+        }
+
         this._loggingElementId = params.loggingElementId;
         this._destroyed = false;
         this.scene = this;

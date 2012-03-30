@@ -26,6 +26,7 @@ var SceneJS_loggingModule = new (function() {
     var queues = {};
     var indent = 0;
     var indentStr = "";
+    var on = true;
 
     /**
      * @private
@@ -59,7 +60,7 @@ var SceneJS_loggingModule = new (function() {
     }
 
     function _logToConsole(message) {
-        if (typeof console == "object") {
+        if (on && typeof console == "object") {
             message = activeSceneId
                     ? indentStr + activeSceneId + ": " + message
                     : indentStr + message;
@@ -182,4 +183,10 @@ var SceneJS_loggingModule = new (function() {
             }
         }
     };
+
+    // @private
+    this.off = function () {
+        on = false;
+    };
+
 })();
