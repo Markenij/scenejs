@@ -1184,6 +1184,18 @@ var SceneJS_DrawListRenderer = function(cfg) {
                                             }
                                         }
 
+                                        if (!oldFlags || newFlags.depthtest != oldFlags.depthtest) {
+                                            if (newFlags.depthtest === false) {
+                                                context.disable(context.DEPTH_TEST);
+                                            } else {
+                                                context.enable(context.DEPTH_TEST);
+                                            }
+                                        }
+
+                                        if (!oldFlags || newFlags.depthmask != oldFlags.depthmask) {
+                                            context.depthMask(newFlags.depthmask === false ? false : true);
+                                        }
+
                                         if (!oldFlags || newFlags.blendFunc != oldFlags.blendFunc) {
                                             if (newFlags.blendFunc) {
                                                 context.blendFunc(glEnum(context, newFlags.blendFunc.sfactor || "one"), glEnum(context, newFlags.blendFunc.dfactor || "zero"));
