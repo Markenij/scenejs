@@ -84,7 +84,7 @@ new (function() {
     };
 
     Light.prototype.setSpecular = function (specular) {
-        this.core.light.specular = specular || true;
+        this.core.light.specular = specular == undefined ? true : specular;
     };
 
     Light.prototype.getSpecular = function() {
