@@ -675,7 +675,16 @@ var SceneJS_DrawListRenderer = function(cfg) {
                                             callCtx.lastRendererProps.restoreProps(context);
                                         }
                                         if (rendererState.props) {
+                                            var tmp;
+                                            if (self._picking && rendererState.props.props.clearColor) {
+                                                // don't apply clearColor for picking
+                                                tmp = rendererState.props.props.clearColor;
+                                                delete rendererState.props.props.clearColor;
+                                            }
                                             rendererState.props.setProps(context);
+                                            if (tmp) {
+                                                rendererState.props.props.clearColor = tmp;
+                                            }
                                         }
                                         callCtx.lastRendererProps = rendererState.props;
                                     };
