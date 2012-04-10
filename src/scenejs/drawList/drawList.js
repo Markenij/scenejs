@@ -376,6 +376,7 @@ var SceneJS_DrawList = new (function() {
 
                 this._nodeMap = this._states.nodeMap = {};
                 this._stateMap = this._states.stateMap = {};
+                this._states.geoNodesMap = {};
             }
         }
 
