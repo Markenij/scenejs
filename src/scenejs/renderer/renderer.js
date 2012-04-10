@@ -483,6 +483,7 @@ new (function() {
             }
             if (mask.depth) {
                 m = m | context.DEPTH_BUFFER_BIT;
+                context.depthMask(true);
             }
             if (mask.stencil) {
                 m = m | context.STENCIL_BUFFER_BIT;
