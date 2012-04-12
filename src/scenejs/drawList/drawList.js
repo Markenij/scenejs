@@ -1163,6 +1163,7 @@ var SceneJS_DrawList = new (function() {
                 var lenVisibleCacheBin = states.lenVisibleCacheBin;
                 var node;
                 var flags;
+                var viewMat, projMat;
 
                 for (var i = 0; i < lenVisibleCacheBin; i++) {  // Need to render all nodes for pick
                     node = visibleCacheBin[i];                  // due to frameBuf effects etc.
@@ -1171,6 +1172,10 @@ var SceneJS_DrawList = new (function() {
                         continue;
                     }
                     nodeRenderer.renderNode(node);
+                    if (node.nameState._id == pickNameState._id) {  // This is the picked node
+                        viewMat = node.viewXFormState.mat;          // => remember its matrices
+                        projMat = node.projXFormState.mat;
+                    }
                 }
 
                 nodeRenderer.cleanup();
@@ -1192,9 +1197,6 @@ var SceneJS_DrawList = new (function() {
                  */
                 var x = (canvasX - w / 2) / (w / 2) ;           // Calculate clip space coordinates
                 var y = -(canvasY - h / 2) / (h / 2) ;
-
-                var viewMat = node.viewXFormState.mat;
-                var projMat = node.projXFormState.mat;
 
                 var pvMat = SceneJS_math_mulMat4(projMat, viewMat, []);
                 var pvMatInverse = SceneJS_math_inverseMat4(pvMat, []);
