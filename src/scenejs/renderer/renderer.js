@@ -31,8 +31,8 @@ new (function() {
                     },
                     enableScissorTest: false,
                     viewport:{
-                        x : 1,
-                        y : 1,
+                        x : 0,
+                        y : 0,
                         width: canvas.canvas.width,
                         height: canvas.canvas.height
                     },
@@ -446,8 +446,8 @@ new (function() {
             if (!context) {
                 v = v || {};
                 return {
-                    x : v.x || 1,
-                    y : v.y || 1,
+                    x : v.x || 0,
+                    y : v.y || 0,
                     width: v.width || canvas.canvas.width,
                     height: v.height || canvas.canvas.height
                 };
@@ -516,8 +516,8 @@ new (function() {
 
     Renderer.prototype.setViewport = function(viewport) {
         this.core.viewport = viewport ? {
-            x : viewport.x || 1,
-            y : viewport.y || 1,
+            x : viewport.x || 0,
+            y : viewport.y || 0,
             width: viewport.width || 1000,
             height: viewport.height || 1000
         } : undefined;

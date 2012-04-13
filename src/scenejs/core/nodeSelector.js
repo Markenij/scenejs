@@ -310,13 +310,13 @@
      * @param offsetY Canvas Y-coordinate
      */
     NodeSelector.prototype.pick = function(offsetX, offsetY, options) {
-        if (!offsetX) {
+        if (offsetX == undefined || offsetX == null) {
             throw SceneJS_errorModule.fatalError("pick param 'offsetX' null or undefined");
         }
         if (typeof offsetX != "number") {
             throw SceneJS_errorModule.fatalError("pick param 'offsetX' should be a number");
         }
-        if (!offsetY) {
+        if (offsetY == undefined || offsetY == null) {
             throw SceneJS_errorModule.fatalError("pick param 'offsetY' null or undefined");
         }
         if (typeof offsetY != "number") {
