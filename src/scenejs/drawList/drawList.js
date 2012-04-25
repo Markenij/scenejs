@@ -1222,7 +1222,7 @@ var SceneJS_DrawList = new (function() {
 
     this._unpackDepth = function(depthZ) {
         var vec = [depthZ[0] / 256.0, depthZ[1] / 256.0, depthZ[2] / 256.0, depthZ[3] / 256.0];
-        var bitShift = [1.0 / (256.0 * 256.0 * 256.0), 1.0 / (256.0 * 256.0), 1.0 / 256.0, 1.0];
+        var bitShift = [1.0, 1.0 / 256.0, 1.0 / (256.0 * 256.0), 1.0 / (256.0 * 256.0 * 256.0)];
         return SceneJS_math_dotVector4(vec, bitShift);
     };
 
@@ -1593,10 +1593,10 @@ var SceneJS_DrawList = new (function() {
         ];
 
         src.push("vec4 packDepth(const in float depth) {");
-        src.push("  const vec4 bitShift = vec4(256.0*256.0*256.0, 256.0*256.0, 256.0, 1.0);");
-        src.push("  const vec4 bitMask  = vec4(0.0, 1.0/256.0, 1.0/256.0, 1.0/256.0);");
+        src.push("  const vec4 bitShift = vec4(1.0, 256.0, 256.0*256.0, 256.0*256.0*256.0);");
+        src.push("  const vec4 bitMask  = vec4(1.0/256.0, 1.0/256.0, 1.0/256.0, 0.0);");
         src.push("  vec4 res = fract(depth * bitShift);");
-        src.push("  res -= res.xxyz * bitMask;");
+        src.push("  res -= res.yzww * bitMask;");
 		src.push("  res *= 256.0 / 255.0;");
         src.push("  return res;");
         src.push("}");
