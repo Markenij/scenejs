@@ -172,11 +172,12 @@ var SceneJS_textureModule = new (function() {
                     }
                 }
                 if (layerParam.blendMode) {
-                    if (layerParam.blendMode != "add" && layerParam.blendMode != "multiply") {
+                    if (layerParam.blendMode != "add" && layerParam.blendMode != "multiply" &&
+                        layerParam.blendMode != "addmultiply") {
                         throw SceneJS_errorModule.fatalError(
                                 SceneJS.errors.NODE_CONFIG_EXPECTED,
                                 "texture layer " + i + " blendMode value is unsupported - " +
-                                "should be either 'add' or 'multiply'");
+                                "should be either 'add' or 'multiply' or 'addmultiply'");
                     }
                 }
                 var layer = {
