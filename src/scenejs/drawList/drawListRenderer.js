@@ -1213,6 +1213,10 @@ var SceneJS_DrawListRenderer = function(cfg) {
                                             }
                                         }
 
+                                        if (!oldFlags || newFlags.linewidth != oldFlags.linewidth) {
+                                            context.lineWidth(newFlags.linewidth || 1);
+                                        }
+
                                         context.uniform1i(uBackfaceTexturingLocation, newFlags.backfaceTexturing == undefined ? true : !!newFlags.backfaceTexturing);
                                         context.uniform1i(uBackfaceLightingLocation, newFlags.backfaceLighting == undefined ? true : !!newFlags.backfaceLighting);
                                         context.uniform1i(uSpecularLightingLocation, newFlags.specular == undefined ? true : !!newFlags.specular);

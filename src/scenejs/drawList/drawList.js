@@ -81,11 +81,12 @@ var SceneJS_DrawList = new (function () {
             picking: true,         // Picking enabled
             clipping: true,        // User-defined clipping enabled
             enabled: true,         // Node not culled from traversal
-            transparent: false,     // Node transparent - works in conjunction with matarial alpha properties
-            backfaces: true,        // Show backfaces
-            frontface: "ccw",       // Default vertex winding for front face
-            depthtest: true,        // Depth test enabled
-            depthmask: true         // Writing to depth buffer enabled
+            transparent: false,    // Node transparent - works in conjunction with matarial alpha properties
+            backfaces: true,       // Show backfaces
+            frontface: "ccw",      // Default vertex winding for front face
+            depthtest: true,       // Depth test enabled
+            depthmask: true,       // Writing to depth buffer enabled
+            linewidth: 1           // Line width
         }
     });
 
