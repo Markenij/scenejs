@@ -2314,7 +2314,7 @@ var SceneJS_DrawList = new (function () {
             src.push("   }");
 
         } else { // No normals
-            src.push("fragColor = vec4((emit * color.rgb) + (emit * color.rgb), alpha);");
+            src.push("fragColor = vec4(emit * color.rgb, alpha);");
         }
 
         /* Color transformations
