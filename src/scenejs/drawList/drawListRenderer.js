@@ -1067,42 +1067,47 @@ var SceneJS_DrawListRenderer = function(cfg) {
          *--------------------------------------------------------------------------------------------------------*/
 
         if (this._picking) {
-            if (! this._lastNameState || node.nameState._stateId != this._lastNameState._stateId) {
 
-                this.createCall(
-                        this._callFuncs["name"]
-                                || (this._callFuncs["name"] =
-                                    (function() {
+            this.createCall(
+                    this._callFuncs["name"]
+                            || (this._callFuncs["name"] =
+                                (function() {
 
-                                        var program = self._program;
-                                        var context = self._context;
+                                    var program = self._program;
+                                    var context = self._context;
 
-                                        var callCtx = self._callCtx;
+                                    var callCtx = self._callCtx;
 
-                                        var nameState = node.nameState;
+                                    var nameState = node.nameState;
 
-                                        var uPickColorLocation = program.getUniformLocation("SCENEJS_uPickColor");
+                                    // For some reason it does not work to only create this call when we have
+                                    // a new stateId. As a work-around we always create a call, but reuse the
+                                    // pick-index when the stateId is still the same.
+                                    var newPickIndex = (!self._lastNameState || node.nameState._stateId != self._lastNameState._stateId) ? true : false;
 
-                                        return function() {
+                                    var uPickColorLocation = program.getUniformLocation("SCENEJS_uPickColor");
 
-                                            if (callCtx.picking) { // Colour-pick pass - feed name's colour into pick shader
+                                    return function() {
 
-                                                if (nameState.name) {
+                                        if (callCtx.picking) { // Colour-pick pass - feed name's colour into pick shader
 
+                                            if (nameState.name) {
+
+                                                if (newPickIndex) {
                                                     self.pickNameStates[self._pickIndex++] = nameState;
-
-                                                    var b = self._pickIndex >> 16 & 0xFF;
-                                                    var g = self._pickIndex >> 8 & 0xFF;
-                                                    var r = self._pickIndex & 0xFF;
-
-                                                    context.uniform3fv(uPickColorLocation, [r / 255, g / 255, b / 255]);
                                                 }
-                                            }
-                                        };
-                                    })()));
 
-                this._lastNameState = node.nameState;
-            }
+                                                var b = self._pickIndex >> 16 & 0xFF;
+                                                var g = self._pickIndex >> 8 & 0xFF;
+                                                var r = self._pickIndex & 0xFF;
+
+                                                context.uniform3fv(uPickColorLocation, [r / 255, g / 255, b / 255]);
+                                            }
+                                        }
+                                    };
+                                })()));
+
+            this._lastNameState = node.nameState;
         }
 
         /*--------------------------------------------------------------------------------------------------------------
