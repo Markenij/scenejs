@@ -371,11 +371,17 @@ new (function() {
             }
             this.core.colorBuf.bind();
             this.core.colorBuf.setData(params.colors, params.offset || 0);
+            if (!params.offset) {
+                this._getArrays().colors = params.colors;
+            }
         }
         else if (this.core.colorBuf) {
             this.core.colorBuf.unbind();
             this.core.colorBuf.destroy();
             delete this.core.colorBuf;
+            if (this._getArrays().colors) {
+                delete this._getArrays().colors;
+            }
         }
     };
 
