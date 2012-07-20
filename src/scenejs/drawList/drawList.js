@@ -2026,12 +2026,7 @@ var SceneJS_DrawList = new (function () {
         */
         src.push("uniform bool  SCENEJS_uBackfaceTexturing;");
         src.push("uniform bool  SCENEJS_uBackfaceLighting;");
-
         src.push("uniform bool  SCENEJS_uSpecularLighting;");
-
-        /* True when rendering transparency
-        */
-        src.push("uniform bool  SCENEJS_uTransparent;");
 
         /* Vertex color variable
         */
@@ -2314,7 +2309,7 @@ var SceneJS_DrawList = new (function () {
             src.push("   }");
 
         } else { // No normals
-            src.push("fragColor = vec4(emit * color.rgb, alpha);");
+            src.push("fragColor = vec4((emit > 1.0 ? emit : 1.0) * color.rgb, alpha);");
         }
 
         /* Color transformations
