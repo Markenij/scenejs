@@ -52,9 +52,27 @@
         return this._targetNode.findNode(nodeId);
     };
 
+    /** returns true if a core with this id exists in this scene
+    *
+    */
+    NodeSelector.prototype.coreExists = function (coreId, type) {
+        if (this._targetNode.attr.type != "scene") {
+            throw SceneJS_errorModule.fatalError("coreExists attempted on node that is not a \"scene\" type: '" + this._targetNode.attr.id + "'");
+        }
+        var sceneId = this._targetNode.scene.attr.id;
+        var sceneCores = this._targetNode._cores[sceneId];
+        if (sceneCores) {
+            var nodeCores = sceneCores[type];
+            if (nodeCores && nodeCores[coreId]) {
+                return true;
+            }
+        }
+        return false;
+    };
+
     /** Find nodes in scene that have IDs matching the given regular expression
-     *
-     */
+    *
+    */
     NodeSelector.prototype.findNodes = function (nodeIdRegex) {
         if (this._targetNode.attr.type != "scene") {
             throw SceneJS_errorModule.fatalError("findNode attempted on node that is not a \"scene\" type: '" + this._targetNode.attr.id + "'");
@@ -69,7 +87,7 @@
         return SceneJS._selectNode(this._targetNode.scene);
     };
 
-    /** Returns true if a child node matching given ID or index existis on the selected node
+    /** Returns true if a child node matching given ID or index exists on the selected node
      * @param {Number|String} node Child node index or ID
      */
     NodeSelector.prototype.hasNode = function(node) {

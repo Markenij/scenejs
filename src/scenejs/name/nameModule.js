@@ -33,11 +33,15 @@
         }
     };
 
-    Name.prototype.setName = function(name) {
+    Name.prototype.setName = function (name) {
         this.core.name = name || "unnamed";
     };
 
-    Name.prototype._compile = function() {
+    Name.prototype.getName = function () {
+        return this.core.name;
+    };
+
+    Name.prototype._compile = function () {
         var id = this.attr.id;
         idStack[stackLen] = id;
         nameStack[stackLen] = this.core.name;
