@@ -347,6 +347,9 @@ new (function() {
     SceneJS_geometry.prototype.setPositions = function(params) {
         this.core.vertexBuf.bind();
         this.core.vertexBuf.setData(params.positions, params.offset || 0);
+        if (!params.offset) {
+            this._getArrays().positions = params.positions;
+        }
     };
 
     SceneJS_geometry.prototype.getNormals = function() {
@@ -356,6 +359,9 @@ new (function() {
     SceneJS_geometry.prototype.setNormals = function(params) {
         this.core.normalBuf.bind();
         this.core.normalBuf.setData(params.normals, params.offset || 0);
+        if (!params.offset) {
+            this._getArrays().normals = params.normals;
+        }
     };
 
     SceneJS_geometry.prototype.getColors = function() {
@@ -397,6 +403,9 @@ new (function() {
     SceneJS_geometry.prototype.setUv = function(params) {
         this.core.uvBuf.bind();
         this.core.uvBuf.setData(params.uv, params.offset || 0);
+        if (!params.offset) {
+            this._getArrays().uv = params.uv;
+        }
     };
 
     SceneJS_geometry.prototype.getUv2 = function() {
@@ -406,10 +415,35 @@ new (function() {
     SceneJS_geometry.prototype.setUv2 = function(params) {
         this.core.uvBuf2.bind();
         this.core.uvBuf2.setData(params.uv2, params.offset || 0);
+        if (!params.offset) {
+            this._getArrays().uv2 = params.uv2;
+        }
     };
 
     SceneJS_geometry.prototype.getPrimitive = function() {
-        return this.attr.primitive;
+        if (this.attr.primitive) {
+            return this.attr.primitive;
+        } else {
+            var context = this.scene.canvas.context;
+            switch (this.core.primitive) {
+                case context.POINTS:
+                    return "points";
+                case context.LINES:
+                    return "lines";
+                case context.LINE_LOOP:
+                    return "line-loop";
+                case context.LINE_STRIP:
+                    return "line-strip";
+                case context.TRIANGLES:
+                    return "triangles";
+                case context.TRIANGLE_STRIP:
+                    return "triangle-strip";
+                case context.TRIANGLE_FAN:
+                    return "triangle-fan";
+                default:
+                    return "unknown";
+            }
+        }
     };
 
     SceneJS_geometry.prototype._getArrays = function() {
