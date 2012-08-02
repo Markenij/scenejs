@@ -326,7 +326,7 @@ new (function() {
                         sleeping = true;
                         window.requestAnimFrame(window[fnName]);
                     }
-                } else {
+                } else if (window[fnName]) {
                     window.requestAnimFrame(window[fnName]);
                 }
             };
