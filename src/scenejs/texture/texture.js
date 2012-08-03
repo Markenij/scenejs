@@ -251,6 +251,14 @@ var SceneJS_textureModule = new (function() {
         }
     };
 
+    Texture.prototype.getLayers = function () {
+        var layers = [];
+        for (var i = 0; i < this.core.layers.length; i++) {
+            layers.push(this.core.layers[i].creationParams);
+        }
+        return layers;
+    };
+
     Texture.prototype._setLayer = function(index, cfg) {
         cfg = cfg || {};
         var layer = this.core.layers[index];
