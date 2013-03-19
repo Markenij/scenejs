@@ -2161,6 +2161,8 @@ var SceneJS_DrawList = new (function () {
 
             src.push("  vec4    texturePos;");
             src.push("  vec2    textureCoord=vec2(0.0,0.0);");
+            src.push("  vec4    tex;");
+            src.push("  float   blendFactor;");
 
             for (var i = 0, len = texState.core.layers.length; i < len; i++) {
                 layer = texState.core.layers[i];
@@ -2200,15 +2202,18 @@ var SceneJS_DrawList = new (function () {
                     src.push("textureCoord=texturePos.xy;");
                 }
 
+                src.push("tex = texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y));");
+                src.push("blendFactor = SCENEJS_uLayer" + i + "BlendFactor * tex.a;");
+
                 /* Alpha from Texture
                 * */
                 if (layer.applyTo == "alpha") {
                     if (layer.blendMode == "multiply") {
-                        src.push("alpha = alpha * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).b);");
+                        src.push("alpha = alpha * (blendFactor * tex.b);");
                     } else if (layer.blendMode == "addmultiply") {
-                        src.push("alpha = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * alpha) + alpha * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).b);");
+                        src.push("alpha = ((1.0 - blendFactor) * alpha) + alpha * (blendFactor * tex.b);");
                     } else {
-                        src.push("alpha = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * alpha) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).b);");
+                        src.push("alpha = ((1.0 - blendFactor) * alpha) + (blendFactor * tex.b);");
                     }
                 }
 
@@ -2216,31 +2221,31 @@ var SceneJS_DrawList = new (function () {
                 */
                 if (layer.applyTo == "baseColor") {
                     if (layer.blendMode == "multiply") {
-                        src.push("color = color * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb);");
+                        src.push("color = color * (blendFactor * tex.rgb);");
                     } else if (layer.blendMode == "addmultiply") {
-                        src.push("color = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * color) + color * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb);");
+                        src.push("color = ((1.0 - blendFactor) * color) + color * (blendFactor * tex.rgb);");
                     } else {
-                        src.push("color = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * color) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb);");
+                        src.push("color = ((1.0 - blendFactor) * color) + (blendFactor * tex.rgb);");
                     }
                 }
 
                 if (layer.applyTo == "emit") {
                     if (layer.blendMode == "multiply") {
-                        src.push("emit = emit * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+                        src.push("emit = emit * (blendFactor * tex.r);");
                     } else if (layer.blendMode == "addmultiply") {
-                        src.push("emit = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * emit) + emit * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+                        src.push("emit = ((1.0 - blendFactor) * emit) + emit * (blendFactor * tex.r);");
                     } else {
-                        src.push("emit = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * emit) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+                        src.push("emit = ((1.0 - blendFactor) * emit) + (blendFactor * tex.r);");
                     }
                 }
 
                 if (layer.applyTo == "specular" && normals) {
                     if (layer.blendMode == "multiply") {
-                        src.push("specular = specular * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+                        src.push("specular = specular * (blendFactor * tex.r);");
                     } else if (layer.blendMode == "addmultiply") {
-                        src.push("specular = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * specular) + specular * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+                        src.push("specular = ((1.0 - blendFactor) * specular) + specular * (blendFactor * tex.r);");
                     } else {
-                        src.push("specular = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * specular) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+                        src.push("specular = ((1.0 - blendFactor) * specular) + (blendFactor * tex.r);");
                     }
                 }
 
