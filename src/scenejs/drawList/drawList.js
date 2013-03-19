@@ -2202,7 +2202,12 @@ var SceneJS_DrawList = new (function () {
                     src.push("textureCoord=texturePos.xy;");
                 }
 
+                /* Texture sample
+                */
                 src.push("tex = texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y));");
+                if (fragmentHooks['textureLayer' + i]) {
+                    src.push("tex=" + fragmentHooks['textureLayer' + i] + "(tex);");
+                }
                 src.push("blendFactor = SCENEJS_uLayer" + i + "BlendFactor * tex.a;");
 
                 /* Alpha from Texture
