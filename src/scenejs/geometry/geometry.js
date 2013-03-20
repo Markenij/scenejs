@@ -135,11 +135,10 @@ new (function() {
                     colorBuf = new SceneJS_webgl_ArrayBuffer(context, context.ARRAY_BUFFER, data.colors, data.colors.length, 4, usage);
                 }
             }
-            var primitive;
+            var primitive = getPrimitiveType(context, data.primitive);
             if (data.indices && data.indices.length > 0) {
-                primitive = getPrimitiveType(context, data.primitive);
                 indexBuf = new SceneJS_webgl_ArrayBuffer(context, context.ELEMENT_ARRAY_BUFFER,
-                        new Uint16Array(data.indices), data.indices.length, 3, usage);
+                        new Uint16Array(data.indices), data.indices.length, 1, usage);
             }
             var geo = {
                 fixed : true, // TODO: support dynamic geometry
@@ -340,16 +339,36 @@ new (function() {
         return this._getArrays() != null;
     };
 
+    SceneJS_geometry.prototype._set = function (dataName, bufferName, vectorLen, params) {
+        if (params && params[dataName]) {
+            if (this.core[bufferName]) {
+                this.core[bufferName].bind();
+                this.core[bufferName].setData(params[dataName], params.offset);
+            } else {
+                var context = this.scene.canvas.context;
+                this.core[bufferName] = new SceneJS_webgl_ArrayBuffer(context, context.ARRAY_BUFFER,
+                    new Float32Array(params[dataName]), params[dataName].length, vectorLen, context.STATIC_DRAW);
+            }
+            if (params.offset === undefined) {
+                this._getArrays()[dataName] = params[dataName];
+            }
+        }
+        else if (this.core[bufferName]) {
+            this.core[bufferName].unbind();
+            this.core[bufferName].destroy();
+            delete this.core[bufferName];
+            if (this._getArrays()[dataName]) {
+                delete this._getArrays()[dataName];
+            }
+        }
+    };
+
     SceneJS_geometry.prototype.getPositions = function() {
         return this._getArrays().positions;
     };
 
     SceneJS_geometry.prototype.setPositions = function(params) {
-        this.core.vertexBuf.bind();
-        this.core.vertexBuf.setData(params.positions, params.offset || 0);
-        if (!params.offset) {
-            this._getArrays().positions = params.positions;
-        }
+        this._set('positions', 'vertexBuf', 3, params);
     };
 
     SceneJS_geometry.prototype.getNormals = function() {
@@ -357,11 +376,7 @@ new (function() {
     };
 
     SceneJS_geometry.prototype.setNormals = function(params) {
-        this.core.normalBuf.bind();
-        this.core.normalBuf.setData(params.normals, params.offset || 0);
-        if (!params.offset) {
-            this._getArrays().normals = params.normals;
-        }
+        this._set('normals', 'normalBuf', 3, params);
     };
 
     SceneJS_geometry.prototype.getColors = function() {
@@ -369,43 +384,43 @@ new (function() {
     };
 
     SceneJS_geometry.prototype.setColors = function (params) {
-        if (params && params.colors) {
-            if (!this.core.colorBuf) {
-                var context = this.scene.canvas.context;
-                var usage = context.STATIC_DRAW;
-                this.core.colorBuf = new SceneJS_webgl_ArrayBuffer(context, context.ARRAY_BUFFER, params.colors, params.colors.length, 4, usage);
-            }
-            this.core.colorBuf.bind();
-            this.core.colorBuf.setData(params.colors, params.offset || 0);
-            if (!params.offset) {
-                this._getArrays().colors = params.colors;
-            }
-        }
-        else if (this.core.colorBuf) {
-            this.core.colorBuf.unbind();
-            this.core.colorBuf.destroy();
-            delete this.core.colorBuf;
-            if (this._getArrays().colors) {
-                delete this._getArrays().colors;
-            }
-        }
+        this._set('colors', 'colorBuf', 4, params);
     };
 
     SceneJS_geometry.prototype.getIndices = function() {
         return this._getArrays().indices;
     };
 
+    SceneJS_geometry.prototype.setIndices = function (params) {
+        if (params && params.indices) {
+            if (this.core.indexBuf) {
+                this.core.indexBuf.bind();
+                this.core.indexBuf.setDataU16(params.indices, params.offset);
+            } else {
+                var context = this.scene.canvas.context;
+                this.core.indexBuf = new SceneJS_webgl_ArrayBuffer(context, context.ELEMENT_ARRAY_BUFFER,
+                    new Uint16Array(params.indices), params.indices.length, 1, context.STATIC_DRAW);
+            }
+            if (params.offset === undefined) {
+                this._getArrays().indices = params.indices;
+            }
+        }
+        else if (this.core.indexBuf) {
+            this.core.indexBuf.unbind();
+            this.core.indexBuf.destroy();
+            delete this.core.indexBuf;
+            if (this._getArrays().indices) {
+                delete this._getArrays().indices;
+            }
+        }
+    };
 
     SceneJS_geometry.prototype.getUv = function() {
         return this._getArrays().uv;
     };
 
     SceneJS_geometry.prototype.setUv = function(params) {
-        this.core.uvBuf.bind();
-        this.core.uvBuf.setData(params.uv, params.offset || 0);
-        if (!params.offset) {
-            this._getArrays().uv = params.uv;
-        }
+        this._set('uv', 'uvBuf', 2, params);
     };
 
     SceneJS_geometry.prototype.getUv2 = function() {
@@ -413,11 +428,7 @@ new (function() {
     };
 
     SceneJS_geometry.prototype.setUv2 = function(params) {
-        this.core.uvBuf2.bind();
-        this.core.uvBuf2.setData(params.uv2, params.offset || 0);
-        if (!params.offset) {
-            this._getArrays().uv2 = params.uv2;
-        }
+        this._set('uv2', 'uvBuf2', 2, params);
     };
 
     SceneJS_geometry.prototype.getPrimitive = function() {

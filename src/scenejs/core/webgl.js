@@ -552,10 +552,20 @@ var SceneJS_webgl_ArrayBuffer;
         };
 
         this.setData = function(data, offset) {
-            if (offset || offset === 0) {
-                context.bufferSubData(type, offset, new Float32Array(data));
+            if (offset || offset === 0 || data.length === this.numItems) {
+                context.bufferSubData(type, offset || 0, new Float32Array(data));
             } else {
-                context.bufferData(type, new Float32Array(data));
+                context.bufferData(type, new Float32Array(data), usage);
+                this.numItems = this.handle.numItems = data.length;
+            }
+        };
+
+        this.setDataU16 = function(data, offset) {
+            if (offset || offset === 0 || data.length === this.numItems) {
+                context.bufferSubData(type, offset || 0, new Uint16Array(data));
+            } else {
+                context.bufferData(type, new Uint16Array(data), usage);
+                this.numItems = this.handle.numItems = data.length;
             }
         };
 
