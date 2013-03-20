@@ -407,7 +407,7 @@ var SceneJS_webgl_Texture2D = function(context, cfg, onComplete) {
         this.magFilter = cfg.magFilter;
         this.wrapS = cfg.wrapS;
         this.wrapT = cfg.wrapT;
-        this.update = cfg.update;  // For dynamically-sourcing textures (ie movies etc)
+        this.autoUpdateImage = cfg.autoUpdate ? image : undefined;  // For dynamically-sourcing textures (ie movies etc)
         context.bindTexture(this.target, this.handle);
         try {
             context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, image); // New API change
@@ -465,8 +465,18 @@ var SceneJS_webgl_Texture2D = function(context, cfg, onComplete) {
         if (this.handle) {
             context.activeTexture(context["TEXTURE" + unit]);
             context.bindTexture(this.target, this.handle);
-            if (this.update) {
-                this.update(context);
+            if (this.autoUpdateImage || this.updateImageOnce) {
+                //TODO: fix this when minefield is upto spec
+                try {
+                    context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, this.autoUpdateImage || this.updateImageOnce);
+                }
+                catch (e) {
+                    context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, this.autoUpdateImage || this.updateImageOnce, null);
+                }
+                context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.LINEAR);
+                context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, context.LINEAR);
+                //context.generateMipmap(context.TEXTURE_2D);
+                this.updateImageOnce = undefined;
             }
             return true;
         }

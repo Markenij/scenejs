@@ -40,22 +40,7 @@ var SceneJS_textureModule = new (function() {
     function createTexture(scene, cfg, onComplete) {
         var context = scene.canvas.context;
         var textureId = SceneJS._createUUID();
-        var update;
         try {
-            if (cfg.autoUpdate) {
-                update = function() {
-                    //TODO: fix this when minefield is upto spec
-                    try {
-                        context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, image);
-                    }
-                    catch(e) {
-                        context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, image, null);
-                    }
-                    context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.LINEAR);
-                    context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, context.LINEAR);
-                    //context.generateMipmap(context.TEXTURE_2D);
-                };
-            }
             return new SceneJS_webgl_Texture2D(context, {
                 textureId : textureId,
                 canvas: scene.canvas,
@@ -76,8 +61,8 @@ var SceneJS_textureModule = new (function() {
                 internalFormat : getGLOption("internalFormat", context, cfg, context.LEQUAL),
                 sourceFormat : getGLOption("sourceType", context, cfg, context.ALPHA),
                 sourceType : getGLOption("sourceType", context, cfg, context.UNSIGNED_BYTE),
-                logging: SceneJS_loggingModule ,
-                update: update
+                logging: SceneJS_loggingModule,
+                autoUpdate: cfg.autoUpdate
             }, onComplete);
         } catch (e) {
             throw SceneJS_errorModule.fatalError(SceneJS.errors.ERROR, "Failed to create texture: " + e.message || e);
@@ -266,6 +251,9 @@ var SceneJS_textureModule = new (function() {
             layer.blendFactor = cfg.blendFactor;
         }
         this._setLayerTransform(cfg, layer);
+        if (cfg.image) {
+            layer.texture.updateImageOnce = cfg.image;
+        }
     };
 
     Texture.prototype._setLayerTransform = function(cfg, layer) {
