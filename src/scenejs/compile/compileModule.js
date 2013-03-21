@@ -158,7 +158,8 @@ var SceneJS_compileModule = new (function() {
         var nodeScene = node.scene;
         var compileScene = this._scenes[nodeScene.attr.id];
 
-        if (compileScene.compilingScene) {
+        if (!compileScene ||                // maybe scene is not alive anymore
+            compileScene.compilingScene) {
             return;
         }
 
