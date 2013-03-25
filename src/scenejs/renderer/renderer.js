@@ -654,7 +654,6 @@ new (function() {
         return this.core.enableCullFace;
     };
 
-
     Renderer.prototype.setCullFace = function(cullFace) {
         this.core.cullFace = cullFace;
     };

@@ -108,10 +108,6 @@ var SceneJS_textureModule = new (function() {
         if (this.core._nodeCount == 1) { // This node is the resource definer
             this.core.layers = [];
             this.core.params = {};
-            var config = SceneJS_debugModule.getConfigs("texturing") || {};
-            var waitForLoad = (config.waitForLoad != undefined && config.waitForLoad != null)
-                    ? config.waitForLoad
-                    : params.waitForLoad;
 
             if (!params.layers) {
                 throw SceneJS_errorModule.fatalError(
@@ -126,82 +122,89 @@ var SceneJS_textureModule = new (function() {
             }
 
             for (var i = 0; i < params.layers.length; i++) {
-                var layerParam = params.layers[i];
-                if (!layerParam.uri && !layerParam.frameBuf && !layerParam.video && !layerParam.image && !layerParam.canvasId) {
-                    throw SceneJS_errorModule.fatalError(
-                            SceneJS.errors.NODE_CONFIG_EXPECTED,
-                            "texture layer " + i + "  has no uri, frameBuf, video or canvasId specified");
-                }
-                if (layerParam.applyFrom) {
-                    if (layerParam.applyFrom != "uv" &&
-                        layerParam.applyFrom != "uv2" &&
-                        layerParam.applyFrom != "normal" &&
-                        layerParam.applyFrom != "geometry") {
-                        throw SceneJS_errorModule.fatalError(
-                                SceneJS.errors.NODE_CONFIG_EXPECTED,
-                                "texture layer " + i + "  applyFrom value is unsupported - " +
-                                "should be either 'uv', 'uv2', 'normal' or 'geometry'");
-                    }
-                }
-                if (layerParam.applyTo) {
-                    if (layerParam.applyTo != "baseColor" && // Colour map
-                        layerParam.applyTo != "specular" && // Specular map
-                        layerParam.applyTo != "emit" && // Emission map
-                        layerParam.applyTo != "alpha" && // Alpha map
-                        //   layerParam.applyTo != "diffuseColor" &&
-                        layerParam.applyTo != "normals") {
-                        throw SceneJS_errorModule.fatalError(
-                                SceneJS.errors.NODE_CONFIG_EXPECTED,
-                                "texture layer " + i + " applyTo value is unsupported - " +
-                                "should be either 'baseColor', 'specular' or 'normals'");
-                    }
-                }
-                if (layerParam.blendMode) {
-                    if (layerParam.blendMode != "add" && layerParam.blendMode != "multiply" &&
-                        layerParam.blendMode != "addmultiply") {
-                        throw SceneJS_errorModule.fatalError(
-                                SceneJS.errors.NODE_CONFIG_EXPECTED,
-                                "texture layer " + i + " blendMode value is unsupported - " +
-                                "should be either 'add' or 'multiply' or 'addmultiply'");
-                    }
-                }
-                var layer = {
-                    image : null,                       // Initialised when state == IMAGE_LOADED
-                    creationParams: layerParam,         // Create texture using this
-                    waitForLoad: waitForLoad,
-                    texture: null,                      // Initialised when state == TEXTURE_LOADED
-                    applyFrom: layerParam.applyFrom || "uv",
-                    applyTo: layerParam.applyTo || "baseColor",
-                    blendMode: layerParam.blendMode || "add",
-                    blendFactor: (layerParam.blendFactor != undefined && layerParam.blendFactor != null) ? layerParam.blendFactor : 1.0,
-                    translate: { x:0, y: 0},
-                    scale: { x: 1, y: 1 },
-                    rotate: { z: 0.0 }
-                };
-
-                this.core.layers.push(layer);
-
-                this._setLayerTransform(layerParam, layer);
-
-                if (layer.creationParams.frameBuf) {
-                    layer.texture = SceneJS._compilationStates.getState("frameBuf", this.scene.attr.id, layer.creationParams.frameBuf);
-
-                } else if (layer.creationParams.video) {
-                    layer.texture = SceneJS._compilationStates.getState("video", this.scene.attr.id, layer.creationParams.video);
-
-                } else {
-                    var self = this;
-                    layer.texture = createTexture(
-                            this.scene,
-                            layer.creationParams,
-                            function() {
-                                if (self._destroyed) {
-                                    destroyTexture(layer.texture);
-                                }
-                                SceneJS_compileModule.nodeUpdated(self, "loaded"); // Trigger display list redraw
-                            });
-                }
+                this.addLayer(params.layers[i]);
             }
+        }
+    };
+
+    Texture.prototype.getNumLayers = function() {
+        return this.core.layers.length;
+    };
+
+    Texture.prototype.addLayer = function(layerParam) {
+        var i = this.core.layers.length;
+        if (!layerParam.uri && !layerParam.frameBuf && !layerParam.video && !layerParam.image && !layerParam.canvasId) {
+            throw SceneJS_errorModule.fatalError(
+                    SceneJS.errors.NODE_CONFIG_EXPECTED,
+                    "texture layer " + i + "  has no uri, frameBuf, video or canvasId specified");
+        }
+        if (layerParam.applyFrom) {
+            if (layerParam.applyFrom != "uv" &&
+                layerParam.applyFrom != "uv2" &&
+                layerParam.applyFrom != "normal" &&
+                layerParam.applyFrom != "geometry") {
+                throw SceneJS_errorModule.fatalError(
+                        SceneJS.errors.NODE_CONFIG_EXPECTED,
+                        "texture layer " + i + "  applyFrom value is unsupported - " +
+                        "should be either 'uv', 'uv2', 'normal' or 'geometry'");
+            }
+        }
+        if (layerParam.applyTo) {
+            if (layerParam.applyTo != "baseColor" && // Colour map
+                layerParam.applyTo != "specular" && // Specular map
+                layerParam.applyTo != "emit" && // Emission map
+                layerParam.applyTo != "alpha" && // Alpha map
+                //   layerParam.applyTo != "diffuseColor" &&
+                layerParam.applyTo != "normals") {
+                throw SceneJS_errorModule.fatalError(
+                        SceneJS.errors.NODE_CONFIG_EXPECTED,
+                        "texture layer " + i + " applyTo value is unsupported - " +
+                        "should be either 'baseColor', 'specular' or 'normals'");
+            }
+        }
+        if (layerParam.blendMode) {
+            if (layerParam.blendMode != "add" && layerParam.blendMode != "multiply" &&
+                layerParam.blendMode != "addmultiply") {
+                throw SceneJS_errorModule.fatalError(
+                        SceneJS.errors.NODE_CONFIG_EXPECTED,
+                        "texture layer " + i + " blendMode value is unsupported - " +
+                        "should be either 'add' or 'multiply' or 'addmultiply'");
+            }
+        }
+        var layer = {
+            image : null,                       // Initialised when state == IMAGE_LOADED
+            creationParams: layerParam,         // Create texture using this
+            texture: null,                      // Initialised when state == TEXTURE_LOADED
+            applyFrom: layerParam.applyFrom || "uv",
+            applyTo: layerParam.applyTo || "baseColor",
+            blendMode: layerParam.blendMode || "add",
+            blendFactor: (layerParam.blendFactor != undefined && layerParam.blendFactor != null) ? layerParam.blendFactor : 1.0,
+            translate: { x:0, y: 0},
+            scale: { x: 1, y: 1 },
+            rotate: { z: 0.0 }
+        };
+
+        this.core.layers.push(layer);
+
+        this._setLayerTransform(layerParam, layer);
+
+        if (layer.creationParams.frameBuf) {
+            layer.texture = SceneJS._compilationStates.getState("frameBuf", this.scene.attr.id, layer.creationParams.frameBuf);
+
+        } else if (layer.creationParams.video) {
+            layer.texture = SceneJS._compilationStates.getState("video", this.scene.attr.id, layer.creationParams.video);
+
+        } else {
+            var self = this;
+            layer.texture = createTexture(
+                    this.scene,
+                    layer.creationParams,
+                    function() {
+                        if (self._destroyed) {
+                            destroyTexture(layer.texture);
+                        }
+                        SceneJS_compileModule.nodeUpdated(self, "loaded"); // Trigger display list redraw
+                    });
         }
     };
 
