@@ -208,6 +208,20 @@ var SceneJS_textureModule = new (function() {
         }
     };
 
+    Texture.prototype.removeLayer = function(index) {
+        if (index == undefined || index == null) {
+            throw SceneJS_errorModule.fatalError(
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "Invalid texture remove layer argument: index null or undefined");
+        }
+        if (index < 0 || index >= this.core.layers.length) {
+            throw SceneJS_errorModule.fatalError(
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "Invalid texture remove layer argument: index out of range (" + this.core.layers.length + " layers defined)");
+        }
+        this.core.layers.splice(index, 1);
+    };
+
     Texture.prototype.setLayer = function(cfg) {
         if (cfg.index == undefined || cfg.index == null) {
             throw SceneJS_errorModule.fatalError(
