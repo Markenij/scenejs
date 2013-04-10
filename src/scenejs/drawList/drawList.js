@@ -1237,6 +1237,7 @@ var SceneJS_DrawList = new (function () {
         var nodeRenderer = states.nodeRenderer;
         var nTransparent = 0;
         var _transparentBin = transparentBin;
+        var i;
 
         if (lenVisibleCacheBin > 0) {
 
@@ -1245,7 +1246,7 @@ var SceneJS_DrawList = new (function () {
             *  - build transparent bin
             *-----------------------------------------------------------*/
 
-            for (var i = 0; i < lenVisibleCacheBin; i++) {
+            for (i = 0; i < lenVisibleCacheBin; i++) {
                 node = visibleCacheBin[i];
                 flags = node.flagsState.flags;
                 if (picking && flags.picking === false) {           // When picking, skip unpickable node
@@ -1287,7 +1288,7 @@ var SceneJS_DrawList = new (function () {
             * Layer order is preserved independently within opaque and transparent bins.
             * At each node that is marked destroyed, we'll just slice it out of the bin array instead.
             */
-            for (var i = 0, len = states.lenBin; i < len; i++) {
+            for (i = 0, len = states.lenBin; i < len; i++) {
                 node = bin[i];
 
                 if (node.destroyed) {
@@ -1593,6 +1594,8 @@ var SceneJS_DrawList = new (function () {
             "precision mediump float;"
         ];
 
+        var i;
+
         src.push("vec4 packDepth(const in float depth) {");
         src.push("  const vec4 bitShift = vec4(1.0, 256.0, 256.0*256.0, 256.0*256.0*256.0);");
         src.push("  const vec4 bitMask  = vec4(1.0/256.0, 1.0/256.0, 1.0/256.0, 0.0);");
@@ -1626,7 +1629,7 @@ var SceneJS_DrawList = new (function () {
         *----------------------------------------------------------------------------------*/
 
         if (clipping) {
-            for (var i = 0; i < clipState.clips.length; i++) {
+            for (i = 0; i < clipState.clips.length; i++) {
                 src.push("uniform float SCENEJS_uClipMode" + i + ";");
                 src.push("uniform vec4  SCENEJS_uClipNormalAndDist" + i + ";");
             }
@@ -1651,7 +1654,7 @@ var SceneJS_DrawList = new (function () {
 
         if (clipping) {
             src.push("  float   dist;");
-            for (var i = 0; i < clipState.clips.length; i++) {
+            for (i = 0; i < clipState.clips.length; i++) {
                 src.push("    if (SCENEJS_uClipMode" + i + " != 0.0) {");
                 src.push("        dist = dot(SCENEJS_vWorldVertex.xyz, SCENEJS_uClipNormalAndDist" + i + ".xyz) - SCENEJS_uClipNormalAndDist" + i + ".w;");
                 src.push("        if (SCENEJS_uClipMode" + i + " == 1.0) {");
@@ -1751,8 +1754,10 @@ var SceneJS_DrawList = new (function () {
         var morphing = morphState.morph && true;
 
         var src = [
-            "precision mediump float;",
+            "precision mediump float;"
         ];
+
+        var i;
 
         src.push("attribute vec3 SCENEJS_aVertex;");                // Model coordinates
 
@@ -1772,7 +1777,7 @@ var SceneJS_DrawList = new (function () {
             src.push("varying   vec3 SCENEJS_vWorldNormal;");   // Output world-space vertex normal
             src.push("varying   vec3 SCENEJS_vViewNormal;");    // Output view-space vertex normal
 
-            for (var i = 0; i < lightState.lights.length; i++) {
+            for (i = 0; i < lightState.lights.length; i++) {
                 var light = lightState.lights[i];
                 if (light.mode == "dir") {
                     src.push("uniform vec3 SCENEJS_uLightDir" + i + ";");
@@ -1918,9 +1923,9 @@ var SceneJS_DrawList = new (function () {
         * Transform the world-space lights into view space
         *----------------------------------------------------------------------------------*/
 
-        src.push("  vec3 tmpVec3;");
-        if (normals) {
-            for (var i = 0; i < lightState.lights.length; i++) {
+        if (normals && lightState.lights.length) {
+            src.push("  vec3 tmpVec3;");
+            for (i = 0; i < lightState.lights.length; i++) {
                 light = lightState.lights[i];
                 if (light.mode == "dir") {
                     src.push("SCENEJS_vLightVecAndDist" + i + " = vec4(-normalize(SCENEJS_uLightDir" + i + "), 0.0);");
@@ -1981,6 +1986,7 @@ var SceneJS_DrawList = new (function () {
         var colortrans = colortransState && colortransState.core;
 
         var src = ["\n"];
+        var i;
 
         src.push("precision mediump float;");
 
@@ -1998,7 +2004,7 @@ var SceneJS_DrawList = new (function () {
         *----------------------------------------------------------------------------------*/
 
         if (clipping) {
-            for (var i = 0; i < clipState.clips.length; i++) {
+            for (i = 0; i < clipState.clips.length; i++) {
                 src.push("uniform float SCENEJS_uClipMode" + i + ";");
                 src.push("uniform vec4  SCENEJS_uClipNormalAndDist" + i + ";");
             }
@@ -2012,7 +2018,7 @@ var SceneJS_DrawList = new (function () {
                 src.push("varying vec2 SCENEJS_vUVCoord2;");
             }
             var layer;
-            for (var i = 0, len = texState.core.layers.length; i < len; i++) {
+            for (i = 0, len = texState.core.layers.length; i < len; i++) {
                 layer = texState.core.layers[i];
                 src.push("uniform sampler2D SCENEJS_uSampler" + i + ";");
                 if (layer.matrix) {
@@ -2054,7 +2060,7 @@ var SceneJS_DrawList = new (function () {
             src.push("varying vec3 SCENEJS_vViewNormal;");                   // View-space normal
 
             var light;
-            for (var i = 0; i < lightState.lights.length; i++) {
+            for (i = 0; i < lightState.lights.length; i++) {
                 light = lightState.lights[i];
                 src.push("uniform vec3  SCENEJS_uLightColor" + i + ";");
                 if (light.mode == "point") {
@@ -2083,7 +2089,7 @@ var SceneJS_DrawList = new (function () {
 
         if (clipping) {
             src.push("  float   dist;");
-            for (var i = 0; i < clipState.clips.length; i++) {
+            for (i = 0; i < clipState.clips.length; i++) {
                 src.push("    if (SCENEJS_uClipMode" + i + " != 0.0) {");
                 src.push("        dist = dot(SCENEJS_vWorldVertex.xyz, SCENEJS_uClipNormalAndDist" + i + ".xyz) - SCENEJS_uClipNormalAndDist" + i + ".w;");
                 src.push("        if (SCENEJS_uClipMode" + i + " == 1.0) {");
@@ -2164,7 +2170,7 @@ var SceneJS_DrawList = new (function () {
             src.push("  vec4    tex;");
             src.push("  float   blendFactor;");
 
-            for (var i = 0, len = texState.core.layers.length; i < len; i++) {
+            for (i = 0, len = texState.core.layers.length; i < len; i++) {
                 layer = texState.core.layers[i];
 
                 /* Texture input
@@ -2277,7 +2283,7 @@ var SceneJS_DrawList = new (function () {
             src.push("  float   lightDist;");
 
             var light;
-            for (var i = 0; i < lightState.lights.length; i++) {
+            for (i = 0; i < lightState.lights.length; i++) {
                 light = lightState.lights[i];
                 src.push("lightVec = SCENEJS_vLightVecAndDist" + i + ".xyz;");
 
