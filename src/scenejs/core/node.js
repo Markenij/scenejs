@@ -516,6 +516,7 @@ SceneJS._Node.prototype.addNode = function(node) {
 /** Inserts a subgraph into child nodes
  * @param {Node} node Child node
  * @param {int} i Index for new child node
+ * or: @param {{node: Node, i: Index}}
  * @return {Node} The child node
  */
 SceneJS._Node.prototype.insertNode = function(node, i) {
@@ -523,6 +524,10 @@ SceneJS._Node.prototype.insertNode = function(node, i) {
         throw SceneJS_errorModule.fatalError(
                 SceneJS.errors.ILLEGAL_NODE_CONFIG,
                 "Node#insertNode - node argument is undefined");
+    }
+    if (node.node) {
+        i = node.i;
+        node = node.node;
     }
     if (!node._compile) {
         node = SceneJS._parseNodeJSON(node, this.scene);
@@ -553,10 +558,30 @@ SceneJS._Node.prototype.insertNode = function(node, i) {
         leaf.addNodes(children);
         this.addNode(node);
 
-    } else if (i < 0) {
+    } else if (i === -1) {
+
+        /* Insert node above this (make it a child of the
+         * parent, and make this a child of node)
+         */
+        if (this.parent) {
+            var j = this.parent.children.indexOf(this);
+            if (j > -1) {
+                this.parent.children[j] = node;
+                node.parent = this.parent;
+                node.children.push(this);
+                this.parent = node;
+                node.parent._resetTreeCompilationMemos();
+                return node;
+            }
+        }
         throw SceneJS_errorModule.fatalError(
                 SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                "Node#insertNode - node index out of range: -1");
+                "Node#insertNode - node index -1, but this has no parent");
+
+    } else if (i < -1) {
+        throw SceneJS_errorModule.fatalError(
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "Node#insertNode - node index out of range: < -1");
 
     } else if (i >= this.children.length) {
         this.children.push(node);
