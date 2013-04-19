@@ -167,7 +167,8 @@ SceneJS.bind = function(name, func) {
                 SceneJS_eventModule.NODE_DESTROYED,
                 function(params) {
                     func({
-                        nodeId : params.nodeId
+                        nodeId : params.nodeId,
+                        sceneId : params.sceneId
                     });
                 });
             break;

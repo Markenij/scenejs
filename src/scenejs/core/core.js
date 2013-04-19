@@ -191,7 +191,8 @@ var SceneJS = {
             for (var i = this._destroyedNodes.length - 1; i >= 0; i--) {
                 node = this._destroyedNodes[i];
                 node._doDestroy();
-                SceneJS_eventModule.fireEvent(SceneJS_eventModule.NODE_DESTROYED, { nodeId : node.attr.id });
+                SceneJS_eventModule.fireEvent(SceneJS_eventModule.NODE_DESTROYED,
+                    { nodeId : node.attr.id, sceneId : node.scene.attr.id });
             }
             this._destroyedNodes = [];
         }
