@@ -1052,7 +1052,7 @@ var SceneJS_DrawList = new (function () {
 
         nodeRenderer.init({
             doProfile: doProfile,                               // Initialise renderer
-            pciking: false,                                     // Drawing mode
+            picking: false,                                     // Drawing mode
             callListDirty: drawCallListDirty,                   // Rebuild draw call list?
             callFuncsDirty: drawCallFuncsDirty                  // Regenerate draw call funcs?
         });
@@ -1154,9 +1154,9 @@ var SceneJS_DrawList = new (function () {
                 rayPickBuf.clear();
 
                 nodeRenderer.init({                             // Initialise renderer
-                    pick: false,
+                    picking: false,
                     rayPick: true,
-                    callListDirty: false,                      // Pick calls clean from pick pass
+                    callListDirty: false,                       // Pick calls clean from pick pass
                     callFuncsDirty: false                       // Call funcs clean from pick pass
                 });
 
@@ -1632,6 +1632,7 @@ var SceneJS_DrawList = new (function () {
             for (i = 0; i < clipState.clips.length; i++) {
                 src.push("uniform float SCENEJS_uClipMode" + i + ";");
                 src.push("uniform vec4  SCENEJS_uClipNormalAndDist" + i + ";");
+                src.push("uniform vec4  SCENEJS_uClipNormalAndDist2" + i + ";");
             }
         }
 
@@ -1657,11 +1658,18 @@ var SceneJS_DrawList = new (function () {
             for (i = 0; i < clipState.clips.length; i++) {
                 src.push("    if (SCENEJS_uClipMode" + i + " != 0.0) {");
                 src.push("        dist = dot(SCENEJS_vWorldVertex.xyz, SCENEJS_uClipNormalAndDist" + i + ".xyz) - SCENEJS_uClipNormalAndDist" + i + ".w;");
-                src.push("        if (SCENEJS_uClipMode" + i + " == 1.0) {");
-                src.push("            if (dist < 0.0) { discard; }");
-                src.push("        }");
-                src.push("        if (SCENEJS_uClipMode" + i + " == 2.0) {");
-                src.push("            if (dist > 0.0) { discard; }");
+                src.push("        if (SCENEJS_uClipMode" + i + " == 3.0) {");
+                src.push("            if (dist < 0.0) {");
+                src.push("                dist = dot(SCENEJS_vWorldVertex.xyz, SCENEJS_uClipNormalAndDist2" + i + ".xyz) - SCENEJS_uClipNormalAndDist2" + i + ".w;");
+                src.push("                if (dist < 0.0) { discard; }");
+                src.push("            }");
+                src.push("        } else {");
+                src.push("            if (SCENEJS_uClipMode" + i + " == 1.0) {");
+                src.push("                if (dist < 0.0) { discard; }");
+                src.push("            }");
+                src.push("            if (SCENEJS_uClipMode" + i + " == 2.0) {");
+                src.push("                if (dist > 0.0) { discard; }");
+                src.push("            }");
                 src.push("        }");
                 src.push("    }");
             }
@@ -1757,7 +1765,7 @@ var SceneJS_DrawList = new (function () {
             "precision mediump float;"
         ];
 
-        var i;
+        var i, light;
 
         src.push("attribute vec3 SCENEJS_aVertex;");                // Model coordinates
 
@@ -1778,7 +1786,7 @@ var SceneJS_DrawList = new (function () {
             src.push("varying   vec3 SCENEJS_vViewNormal;");    // Output view-space vertex normal
 
             for (i = 0; i < lightState.lights.length; i++) {
-                var light = lightState.lights[i];
+                light = lightState.lights[i];
                 if (light.mode == "dir") {
                     src.push("uniform vec3 SCENEJS_uLightDir" + i + ";");
                 }
@@ -1986,7 +1994,7 @@ var SceneJS_DrawList = new (function () {
         var colortrans = colortransState && colortransState.core;
 
         var src = ["\n"];
-        var i;
+        var i, layer, light;
 
         src.push("precision mediump float;");
 
@@ -2007,6 +2015,7 @@ var SceneJS_DrawList = new (function () {
             for (i = 0; i < clipState.clips.length; i++) {
                 src.push("uniform float SCENEJS_uClipMode" + i + ";");
                 src.push("uniform vec4  SCENEJS_uClipNormalAndDist" + i + ";");
+                src.push("uniform vec4  SCENEJS_uClipNormalAndDist2" + i + ";");
             }
         }
 
@@ -2017,7 +2026,6 @@ var SceneJS_DrawList = new (function () {
             if (geoState.geo.uvBuf2) {
                 src.push("varying vec2 SCENEJS_vUVCoord2;");
             }
-            var layer;
             for (i = 0, len = texState.core.layers.length; i < len; i++) {
                 layer = texState.core.layers[i];
                 src.push("uniform sampler2D SCENEJS_uSampler" + i + ";");
@@ -2059,7 +2067,6 @@ var SceneJS_DrawList = new (function () {
             src.push("varying vec3 SCENEJS_vWorldNormal;");                  // World-space normal
             src.push("varying vec3 SCENEJS_vViewNormal;");                   // View-space normal
 
-            var light;
             for (i = 0; i < lightState.lights.length; i++) {
                 light = lightState.lights[i];
                 src.push("uniform vec3  SCENEJS_uLightColor" + i + ";");
@@ -2092,11 +2099,18 @@ var SceneJS_DrawList = new (function () {
             for (i = 0; i < clipState.clips.length; i++) {
                 src.push("    if (SCENEJS_uClipMode" + i + " != 0.0) {");
                 src.push("        dist = dot(SCENEJS_vWorldVertex.xyz, SCENEJS_uClipNormalAndDist" + i + ".xyz) - SCENEJS_uClipNormalAndDist" + i + ".w;");
-                src.push("        if (SCENEJS_uClipMode" + i + " == 1.0) {");
-                src.push("            if (dist < 0.0) { discard; }");
-                src.push("        }");
-                src.push("        if (SCENEJS_uClipMode" + i + " == 2.0) {");
-                src.push("            if (dist > 0.0) { discard; }");
+                src.push("        if (SCENEJS_uClipMode" + i + " == 3.0) {");
+                src.push("            if (dist < 0.0) {");
+                src.push("                dist = dot(SCENEJS_vWorldVertex.xyz, SCENEJS_uClipNormalAndDist2" + i + ".xyz) - SCENEJS_uClipNormalAndDist2" + i + ".w;");
+                src.push("                if (dist < 0.0) { discard; }");
+                src.push("            }");
+                src.push("        } else {");
+                src.push("            if (SCENEJS_uClipMode" + i + " == 1.0) {");
+                src.push("                if (dist < 0.0) { discard; }");
+                src.push("            }");
+                src.push("            if (SCENEJS_uClipMode" + i + " == 2.0) {");
+                src.push("                if (dist > 0.0) { discard; }");
+                src.push("            }");
                 src.push("        }");
                 src.push("    }");
             }
@@ -2158,7 +2172,6 @@ var SceneJS_DrawList = new (function () {
             src.push("  vec3    normalVec=SCENEJS_vWorldNormal;");
         }
 
-        var layer;
         if (texturing) {
 
             if (normals) {
@@ -2282,7 +2295,6 @@ var SceneJS_DrawList = new (function () {
             src.push("  float   dotN;");
             src.push("  float   lightDist;");
 
-            var light;
             for (i = 0; i < lightState.lights.length; i++) {
                 light = lightState.lights[i];
                 src.push("lightVec = SCENEJS_vLightVecAndDist" + i + ".xyz;");

@@ -863,19 +863,25 @@ var SceneJS_DrawListRenderer = function(cfg) {
 
                             var uClipModeLocation = program.getUniformLocation("SCENEJS_uClipMode" + k);
                             var uClipNormalAndDist = program.getUniformLocation("SCENEJS_uClipNormalAndDist" + k);
+                            var uClipNormalAndDist2 = program.getUniformLocation("SCENEJS_uClipNormalAndDist2" + k);
 
                             return function() {
-                                if (uClipModeLocation && uClipNormalAndDist) {
+                                if (uClipModeLocation && uClipNormalAndDist && uClipNormalAndDist2) {
                                     if (flags.clipping === false) { // Flags disable/enable clipping
                                         context.uniform1f(uClipModeLocation, 0);
                                     } else if (clip.mode == "inside") {
                                         context.uniform1f(uClipModeLocation, 2);
                                     } else if (clip.mode == "outside") {
                                         context.uniform1f(uClipModeLocation, 1);
+                                    } else if (clip.mode == "outsideBoth") {
+                                        context.uniform1f(uClipModeLocation, 3);
                                     } else { // disabled
                                         context.uniform1f(uClipModeLocation, 0);
                                     }
                                     context.uniform4fv(uClipNormalAndDist, clip.normalAndDist);
+                                    if (clip.normalAndDist2) {
+                                        context.uniform4fv(uClipNormalAndDist2, clip.normalAndDist2);
+                                    }
                                 }
                             };
                         } )());

@@ -47,6 +47,7 @@ var SceneJS_eventModule = new (function() {
     this.NODE_CREATED = 39;
     this.NODE_UPDATED = 40;
     this.NODE_DESTROYED = 41;
+    this.BEFORE_SCENE_RENDERING = 42;
 
 
 
@@ -169,6 +170,15 @@ SceneJS.bind = function(name, func) {
                     func({
                         nodeId : params.nodeId,
                         sceneId : params.sceneId
+                    });
+                });
+            break;
+
+        case "before-scene-rendering": SceneJS_eventModule.addListener(
+                SceneJS_eventModule.BEFORE_SCENE_RENDERING,
+                function(params) {
+                    func({
+                        sceneId: params.sceneId
                     });
                 });
             break;

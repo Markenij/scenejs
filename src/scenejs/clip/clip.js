@@ -37,6 +37,9 @@ new (function() {
             this.setA(params.a);
             this.setB(params.b);
             this.setC(params.c);
+            this.setD(params.d);
+            this.setE(params.e);
+            this.setF(params.f);
 
 //            this.core.doClean = function() {
 //                var modelMat = SceneJS_modelTransformModule.transform.matrix;
@@ -60,10 +63,10 @@ new (function() {
      */
     Clip.prototype.setMode = function(mode) {
         mode = mode || "outside";
-        if (mode != "disabled" && mode != "inside" && mode != "outside") {
+        if (mode != "disabled" && mode != "inside" && mode != "outside" && mode != "outsideBoth") {
             throw SceneJS_errorModule.fatalError(
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                    "SceneJS.clip has a mode of unsupported type: '" + mode + " - should be 'disabled', 'inside' or 'outside'");
+                    "SceneJS.clip has a mode of unsupported type: '" + mode + " - should be 'disabled', 'inside', 'outside' or 'outsideBoth'");
         }
         this.core.mode = mode;
     };
@@ -141,12 +144,66 @@ new (function() {
         };
     };
 
+    Clip.prototype.setDef = function(def) {
+        def = def || {};
+        this.setD(def.d);
+        this.setE(def.e);
+        this.setF(def.f);
+    };
+
+    Clip.prototype.getDef = function() {
+        return {
+            d: this.getD(),
+            e: this.getE(),
+            f: this.getF()
+        };
+    };
+
+    Clip.prototype.setD = function(d) {
+        this.core.d = d && [d.x, d.y, d.z, 1];
+    };
+
+    Clip.prototype.getD = function() {
+        return this.core.d && {
+            x: this.core.d[0],
+            y: this.core.d[1],
+            z: this.core.d[2]
+        };
+    };
+
+    Clip.prototype.setE = function(e) {
+        this.core.e = e && [e.x, e.y, e.z, 1];
+    };
+
+    Clip.prototype.getE = function() {
+        return this.core.e && {
+            x: this.core.e[0],
+            y: this.core.e[1],
+            z: this.core.e[2]
+        };
+    };
+
+    Clip.prototype.setF = function(f) {
+        this.core.f = f && [f.x, f.y, f.z, 1];
+    };
+
+    Clip.prototype.getF = function() {
+        return this.core.f && {
+            x: this.core.f[0],
+            y: this.core.f[1],
+            z: this.core.f[2]
+        };
+    };
+
     Clip.prototype.getAttributes = function() {
         return {
             mode: this.core.mode,
             a: this.getA(),
             b: this.getB(),
-            c: this.getC()
+            c: this.getC(),
+            d: this.getD(),
+            e: this.getE(),
+            f: this.getF()
         };
     };
 
@@ -154,20 +211,36 @@ new (function() {
 
         var core = this.core;
 
-                var modelMat = SceneJS_modelTransformModule.transform.matrix;
-                var worldA = SceneJS_math_transformPoint3(modelMat, core.a);
-                var worldB = SceneJS_math_transformPoint3(modelMat, core.b);
-                var worldC = SceneJS_math_transformPoint3(modelMat, core.c);
-                var normal = SceneJS_math_normalizeVec3(
-                        SceneJS_math_cross3Vec4(
-                                SceneJS_math_normalizeVec3(
-                                        SceneJS_math_subVec3(worldB, worldA, [0,0,0]), [0,0,0]),
-                                SceneJS_math_normalizeVec3(
-                                        SceneJS_math_subVec3(worldB, worldC, [0,0,0]), [0,0,0])));
+        var modelMat = SceneJS_modelTransformModule.transform.matrix;
+        var worldA = SceneJS_math_transformPoint3(modelMat, core.a);
+        var worldB = SceneJS_math_transformPoint3(modelMat, core.b);
+        var worldC = SceneJS_math_transformPoint3(modelMat, core.c);
+        var normal = SceneJS_math_normalizeVec3(
+                SceneJS_math_cross3Vec4(
+                        SceneJS_math_normalizeVec3(
+                                SceneJS_math_subVec3(worldB, worldA, [0, 0, 0]), [0, 0, 0]),
+                        SceneJS_math_normalizeVec3(
+                                SceneJS_math_subVec3(worldB, worldC, [0, 0, 0]), [0, 0, 0])));
 
-                var dist = SceneJS_math_dotVector3(normal, worldA);
+        var dist = SceneJS_math_dotVector3(normal, worldA);
 
-                core.normalAndDist = [normal[0], normal[1], normal[2], dist];
+        core.normalAndDist = [normal[0], normal[1], normal[2], dist];
+
+        if (core.d && core.e && core.f) {
+            worldA = SceneJS_math_transformPoint3(modelMat, core.d);
+            worldB = SceneJS_math_transformPoint3(modelMat, core.e);
+            worldC = SceneJS_math_transformPoint3(modelMat, core.f);
+            normal = SceneJS_math_normalizeVec3(
+                SceneJS_math_cross3Vec4(
+                    SceneJS_math_normalizeVec3(
+                        SceneJS_math_subVec3(worldB, worldA, [0, 0, 0]), [0, 0, 0]),
+                    SceneJS_math_normalizeVec3(
+                        SceneJS_math_subVec3(worldB, worldC, [0, 0, 0]), [0, 0, 0])));
+
+            dist = SceneJS_math_dotVector3(normal, worldA);
+
+            core.normalAndDist2 = [normal[0], normal[1], normal[2], dist];
+        }
 
         clipStack[stackLen] = core;
         idStack[stackLen] = this.attr.id;
