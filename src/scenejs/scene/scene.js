@@ -233,20 +233,14 @@ new (function() {
     /**
      * Perform any scheduled scene compilations and return true if the scene needs a redraw
      */
-    Scene.prototype._compileScene = function() {
-        if (SceneJS_compileModule.shouldCompileOrRedrawScene(this.attr.id)) {
-            // fire before beginSceneCompile, so that changes in the scene will
-            // not trigger another compilation afterwards, but will be integrated
-            // in this compilation
-            SceneJS_eventModule.fireEvent(SceneJS_eventModule.BEFORE_SCENE_RENDERING, {
-                sceneId: this.attr.id
-            });
-            var compileFlags = SceneJS_compileModule.beginSceneCompile(this.attr.id);
-            // level could be REDRAW
+    Scene.prototype._compileScene = function () {
+        var compileFlags = SceneJS_compileModule.beginSceneCompile(this.attr.id);
+        if (compileFlags.level != SceneJS_compileModule.COMPILE_NOTHING) {   // level could be REDRAW
             SceneJS_DrawList.bindScene({ sceneId: this.attr.id }, {
                 compileMode: compileFlags.level == SceneJS_compileModule.COMPILE_EVERYTHING ?
                              SceneJS_DrawList.COMPILE_SCENE : SceneJS_DrawList.COMPILE_NODES,
-                resort: compileFlags.resort });
+                resort: compileFlags.resort
+            });
             this._compileWithEvents();
             SceneJS_compileModule.finishSceneCompile();
             return true; // Redraw needed

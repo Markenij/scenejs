@@ -1012,6 +1012,7 @@ var SceneJS_DrawList = new (function () {
     *----------------------------------------------------------------------------------------------------------------*/
 
     this.renderFrame = function (params) {
+        //console.log('renderFrame');
 
         var states = this._states;
 
