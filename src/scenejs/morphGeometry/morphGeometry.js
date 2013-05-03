@@ -1,4 +1,4 @@
-new (function() {
+new (function () {
 
     var idStack = [];
     var morphStack = [];
@@ -7,13 +7,13 @@ new (function() {
 
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.SCENE_COMPILING,
-            function() {
+            function () {
                 stackLen = 0;
             });
 
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.SCENE_RENDERING,
-            function() {
+            function () {
                 if (dirty) {
                     if (stackLen > 0) {
                         SceneJS_DrawList.setMorph(idStack[stackLen - 1], morphStack[stackLen - 1]);
@@ -25,9 +25,9 @@ new (function() {
             });
 
     /**
-     * Destroys morph, returning true if memory freed, else false
-     * where canvas not found and morph was implicitly destroyed
-     */
+    * Destroys morph, returning true if memory freed, else false
+    * where canvas not found and morph was implicitly destroyed
+    */
     function destroyMorph(morph) {
         if (document.getElementById(morph.canvas.canvasId)) { // Context won't exist if canvas has disappeared
             var target;
@@ -54,16 +54,16 @@ new (function() {
         if (typeof source == "string") {
 
             /* Load from stream - http://scenejs.wikispaces.com/MorphGeoLoaderService
-             */
+            */
             var geoService = SceneJS.Services.getService(SceneJS.Services.MORPH_GEO_LOADER_SERVICE_ID);
             geoService.loadMorphGeometry(source,
-                    function(data) {
+                    function (data) {
                         callback(_createMorph(scene, data, options));
                     });
         } else {
 
             /* Create from arrays
-             */
+            */
             return _createMorph(scene, createTypedMorph(source), options);
         }
     }
@@ -108,8 +108,9 @@ new (function() {
 
             var target;
             var newTarget;
+            var i, len;
 
-            for (var i = 0, len = data.targets.length; i < len; i++) {
+            for (i = 0, len = data.targets.length; i < len; i++) {
                 target = data.targets[i];
                 newTarget = {};
                 morph.targets.push(newTarget);  // We'll iterate this to destroy targets when we recover from error
@@ -136,8 +137,8 @@ new (function() {
         } catch (e) {
 
             /* Allocation failure - deallocate all target VBOs
-             */
-            for (var i = 0, len = morph.targets.length; i < len; i++) {
+            */
+            for (i = 0, len = morph.targets.length; i < len; i++) {
                 target = morph.targets[i];
                 if (target.vertexBuf) {
                     target.vertexBuf.destroy();
@@ -158,7 +159,7 @@ new (function() {
 
     var MorphGeometry = SceneJS.createNodeType("morphGeometry");
 
-    MorphGeometry.prototype._init = function(params) {
+    MorphGeometry.prototype._init = function (params) {
 
         if (this.core._nodeCount == 1) { // This node defines the resource
 
@@ -168,8 +169,8 @@ new (function() {
             } else if (params.stream) {
 
                 /* Load from stream
-                 * TODO: Expose the arrays on the node
-                 */
+                * TODO: Expose the arrays on the node
+                */
                 this._stream = params.stream;
                 this.core._loading = true;
 
@@ -178,7 +179,7 @@ new (function() {
                         this.scene,
                         this._stream,
                         params.options,
-                        function(morph) {
+                        function (morph) {
                             SceneJS._apply(morph, self.core);
                             self.core._loading = false;
                             SceneJS_compileModule.nodeUpdated(self, "loaded"); // Compile again to apply freshly-loaded geometry
@@ -186,10 +187,10 @@ new (function() {
             } else {
 
                 /* Create from arrays
-                 */
+                */
                 SceneJS._apply(createMorphGeometry(this.scene, this._createMorphData(params), params.options), this.core);
             }
-            
+
             this.setFactor(params.factor);
         }
 
@@ -197,7 +198,7 @@ new (function() {
         this.core.clamp = !!params.clamp;
     };
 
-    MorphGeometry.prototype._createMorphData = function(params) {
+    MorphGeometry.prototype._createMorphData = function (params) {
         var targets = params.targets || [];
         if (targets.length < 2) {
             throw SceneJS_errorModule.fatalError(
@@ -212,15 +213,16 @@ new (function() {
         }
 
         /* First target's arrays are defaults for where not given on subsequent targets
-         */
+        */
 
         var positions;
         var normals;
         var uv;
         var uv2;
         var target;
+        var i, len;
 
-        for (var i = 0, len = targets.length; i < len; i++) {
+        for (i = 0, len = targets.length; i < len; i++) {
             target = targets[i];
             if (!positions && target.positions) {
                 positions = target.positions.slice(0);
@@ -236,7 +238,7 @@ new (function() {
             }
         }
 
-        for (var i = 0, len = targets.length; i < len; i++) {
+        for (i = 0, len = targets.length; i < len; i++) {
             target = targets[i];
             if (!target.positions) {
                 target.positions = positions;  // Can be undefined
@@ -252,23 +254,23 @@ new (function() {
             }
         }
         return {
-            keys : keys,
-            targets : targets,
-            key1 : 0,
-            key2 : 1,
+            keys: keys,
+            targets: targets,
+            key1: 0,
+            key2: 1,
             factor: 0
         };
     };
 
-    MorphGeometry.prototype.getState = function() {
+    MorphGeometry.prototype.getState = function () {
         return this.core;
     };
 
-    MorphGeometry.prototype.getStream = function() {
+    MorphGeometry.prototype.getStream = function () {
         return this._stream;
     };
 
-    MorphGeometry.prototype.setFactor = function(factor) {
+    MorphGeometry.prototype.setFactor = function (factor) {
         factor = factor || 0.0;
 
         var core = this.core;
@@ -297,23 +299,23 @@ new (function() {
         }
 
         /* Normalise factor to range [0.0..1.0] for the target frame
-         */
+        */
         core.factor = (factor - keys[key1]) / (keys[key2] - keys[key1]);
         core.key1 = key1;
         core.key2 = key2;
     };
 
-    MorphGeometry.prototype.getFactor = function() {
+    MorphGeometry.prototype.getFactor = function () {
         return this.core.factor;
     };
 
-    MorphGeometry.prototype._compile = function() {
+    MorphGeometry.prototype._compile = function () {
         this._preCompile();
         this._compileNodes();
         this._postCompile();
     };
 
-    MorphGeometry.prototype._preCompile = function() {
+    MorphGeometry.prototype._preCompile = function () {
         if (!this.core._loading) {
             idStack[stackLen] = this.attr.id;
             morphStack[stackLen] = this.core;
@@ -322,14 +324,14 @@ new (function() {
         }
     };
 
-    MorphGeometry.prototype._postCompile = function() {
+    MorphGeometry.prototype._postCompile = function () {
         if (!this.core._loading) {
             stackLen--;
             dirty = true;
         }
     };
 
-    MorphGeometry.prototype._destroy = function() {
+    MorphGeometry.prototype._destroy = function () {
         if (this.core._nodeCount == 1) { // Last resource user
             destroyMorph(this.core);
         }

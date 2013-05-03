@@ -59,14 +59,21 @@ new (function() {
     };
 
     /**
-     Sets the clipping mode. Default is "disabled".
-     */
-    Clip.prototype.setMode = function(mode) {
+    * Sets the clipping mode. Default is "disabled".
+    * The following modes use two clipping planes (abc and def):
+    * "outsideOne": everything is clipped what is outside one of the planes
+    *               (equivalent to activating 2 independent clpping planes)
+    * "outsideBoth": everything is clipped what is outside both of the planes
+    *               (this can not be achieved with independent planes)
+    */
+    Clip.prototype.setMode = function (mode) {
         mode = mode || "outside";
-        if (mode != "disabled" && mode != "inside" && mode != "outside" && mode != "outsideBoth") {
+        if (mode != "disabled" && mode != "inside" && mode != "outside" &&
+            mode != "outsideOne" && mode != "outsideBoth") {
             throw SceneJS_errorModule.fatalError(
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                    "SceneJS.clip has a mode of unsupported type: '" + mode + " - should be 'disabled', 'inside', 'outside' or 'outsideBoth'");
+                    "SceneJS.clip has a mode of unsupported type: '" + mode +
+                    " - should be 'disabled', 'inside', 'outside', 'outsideOne' or 'outsideBoth'");
         }
         this.core.mode = mode;
     };

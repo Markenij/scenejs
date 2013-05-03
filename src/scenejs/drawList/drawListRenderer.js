@@ -873,8 +873,10 @@ var SceneJS_DrawListRenderer = function(cfg) {
                                         context.uniform1f(uClipModeLocation, 2);
                                     } else if (clip.mode == "outside") {
                                         context.uniform1f(uClipModeLocation, 1);
-                                    } else if (clip.mode == "outsideBoth") {
+                                    } else if (clip.mode == "outsideOne") {
                                         context.uniform1f(uClipModeLocation, 3);
+                                    } else if (clip.mode == "outsideBoth") {
+                                        context.uniform1f(uClipModeLocation, 4);
                                     } else { // disabled
                                         context.uniform1f(uClipModeLocation, 0);
                                     }

@@ -42,8 +42,7 @@
     };
 
     Name.prototype._compile = function () {
-        var id = this.attr.id;
-        idStack[stackLen] = id;
+        idStack[stackLen] = this.attr.id;
         nameStack[stackLen] = this.core.name;
         stackLen++;
         dirty = true;
