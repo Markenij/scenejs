@@ -1012,13 +1012,13 @@ var SceneJS_DrawList = new (function () {
     *----------------------------------------------------------------------------------------------------------------*/
 
     this.renderFrame = function (params) {
-        //console.log('renderFrame');
-
         var states = this._states;
 
         if (!states) {
             throw SceneJS_errorModule.fatalError("No scene bound");
         }
+
+        //console.log('renderFrame ' + states.sceneId);
 
         states.pickBufDirty = true;   // Pick buff will now need rendering on next pick
 

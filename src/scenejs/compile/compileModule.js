@@ -318,6 +318,19 @@ var SceneJS_compileModule = new (function() {
         return result;
     };
 
+    /**
+    * Returns true if beginSceneCompile would return anything
+    * different to this.COMPILE_NOTHING
+    */
+    this.shouldCompileScene = function (sceneId) {
+        if (!this._enableCompiler) {
+            return true;
+        }
+        var compileScene = this._scenes[sceneId];
+        return compileScene.compilingScene || compileScene.redraw ||
+            compileScene.compilationQueue.size > 0 ? true : false;
+    };
+
     /** Flags node and all nodes on path to root for recompilation
      */
     this._flagCompilePath = function(compileScene, targetNode) {

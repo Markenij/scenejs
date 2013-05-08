@@ -382,8 +382,8 @@
 
         if (cfg.idleFunc) {
             var idleFunc = cfg.idleFunc;
-            cfg.idleFunc = function(params) {
-                idleFunc.call(self, params);
+            cfg.idleFunc = function() {
+                idleFunc.call(self);
             };
         }
         if (cfg.frameFunc) {
@@ -396,6 +396,12 @@
             var sleepFunc = cfg.sleepFunc;
             cfg.sleepFunc = function() {
                 sleepFunc.call(self);
+            };
+        }
+        if (cfg.beforeCompileFunc) {
+            var beforeCompileFunc = cfg.beforeCompileFunc;
+            cfg.beforeCompileFunc = function() {
+                beforeCompileFunc.call(self);
             };
         }
         this._targetNode.start(cfg);

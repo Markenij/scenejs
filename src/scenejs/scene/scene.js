@@ -249,6 +249,13 @@ new (function() {
     };
 
     /**
+    * Same return value as _compileScene, but does nothing
+    */
+    Scene.prototype._shouldCompileScene = function () {
+        return SceneJS_compileModule.shouldCompileScene(this.attr.id);
+    };
+
+    /**
      * Render a single frame if new frame pending, or force a new frame
      * Returns true if frame rendered
      */
@@ -308,6 +315,11 @@ new (function() {
                     SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_IDLE, {
                         sceneId: self.attr.id
                     });
+                    if (cfg.beforeCompileFunc && self._shouldCompileScene()) {
+                        // always called before compiling the scene - only if there are any
+                        // changes pending thus the scene will be compiled.
+                        cfg.beforeCompileFunc();
+                    }
                     if (self._compileScene()) {         // Attempt pending compile and redraw
                         sleeping = false;
                         SceneJS_DrawList.renderFrame({
