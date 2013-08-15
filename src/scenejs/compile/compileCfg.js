@@ -281,7 +281,7 @@ var SceneJS_compileCfg = new (function() {
                         level: this.REDRAW
                     },
                     indices: {
-                        level: this.REDRAW
+                        level: this.COMPILE_SCENE
                     }
                 }
             },
