@@ -237,6 +237,7 @@ var SceneJS_compileModule = new (function() {
         if (compileScene.compilingScene) {
             compileScene.flagSceneCompile = true;
             compileScene.compilingScene = false;
+            compileScene.redraw = false;
             return { level: this.COMPILE_EVERYTHING };
         }
 
