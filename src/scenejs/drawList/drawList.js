@@ -86,6 +86,7 @@ var SceneJS_DrawList = new (function () {
             frontface: "ccw",      // Default vertex winding for front face
             depthtest: true,       // Depth test enabled
             depthmask: true,       // Writing to depth buffer enabled
+            dynamicColors: false,  // dynamically combine material base color with vertex colors 
             linewidth: 1           // Line width
         }
     });
@@ -2047,6 +2048,7 @@ var SceneJS_DrawList = new (function () {
         src.push("uniform bool  SCENEJS_uBackfaceTexturing;");
         src.push("uniform bool  SCENEJS_uBackfaceLighting;");
         src.push("uniform bool  SCENEJS_uSpecularLighting;");
+        src.push("uniform bool  SCENEJS_uDynamicColors;");
 
         /* Vertex color variable
         */
@@ -2148,7 +2150,13 @@ var SceneJS_DrawList = new (function () {
         }
 
         if (geoState.geo.colorBuf) {
-            src.push("  vec3    color   = SCENEJS_vColor.rgb * SCENEJS_uMaterialBaseColor;");
+            src.push("  vec3 color;");
+            src.push("  if (SCENEJS_uDynamicColors) {");
+            src.push("    float whiteComp = min(min(SCENEJS_vColor.r, SCENEJS_vColor.g), SCENEJS_vColor.b);");
+            src.push("    color = SCENEJS_vColor.rgb - whiteComp + whiteComp * SCENEJS_uMaterialBaseColor;")
+            src.push("  } else {");
+            src.push("    color = SCENEJS_vColor.rgb * SCENEJS_uMaterialBaseColor;");
+            src.push("  }");
         } else {
             src.push("  vec3    color   = SCENEJS_uMaterialBaseColor;")
         }

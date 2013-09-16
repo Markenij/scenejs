@@ -1165,6 +1165,7 @@ var SceneJS_DrawListRenderer = function(cfg) {
                                     var uBackfaceTexturingLocation = program.getUniformLocation("SCENEJS_uBackfaceTexturing");
                                     var uBackfaceLightingLocation = program.getUniformLocation("SCENEJS_uBackfaceLighting");
                                     var uSpecularLightingLocation = program.getUniformLocation("SCENEJS_uSpecularLighting");
+                                    var uDynamicColorsLocation = program.getUniformLocation("SCENEJS_uDynamicColors");
 
                                     var flagsState = nodeFlagsState;
 
@@ -1233,6 +1234,7 @@ var SceneJS_DrawListRenderer = function(cfg) {
                                         context.uniform1i(uBackfaceTexturingLocation, newFlags.backfaceTexturing == undefined ? true : !!newFlags.backfaceTexturing);
                                         context.uniform1i(uBackfaceLightingLocation, newFlags.backfaceLighting == undefined ? true : !!newFlags.backfaceLighting);
                                         context.uniform1i(uSpecularLightingLocation, newFlags.specular == undefined ? true : !!newFlags.specular);
+                                        context.uniform1i(uDynamicColorsLocation, !!newFlags.dynamicColors);
 
                                         //            var mask = newFlags.colorMask;
                                         //
