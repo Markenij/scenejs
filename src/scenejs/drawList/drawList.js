@@ -1107,25 +1107,25 @@ var SceneJS_DrawList = new (function () {
 
         pickBuf.bind();                                                                 // Bind pick buffer
 
-        //  if (states.pickCallListDirty || states.pickBufDirty) {                          // Render pick buffer
+        if (states.pickCallListDirty || states.pickBufDirty) {                          // Render pick buffer
 
-        pickBuf.clear();
+            pickBuf.clear();
 
-        nodeRenderer.init({
-            picking: true,
-            callListDirty: states.pickCallListDirty,                                // (Re)create call list if dirty
-            callFuncsDirty: states.pickCallFuncsDirty                               // (Re)generate functions if dirty
-        });
+            nodeRenderer.init({
+                picking: true,
+                callListDirty: states.pickCallListDirty,                                // (Re)create call list if dirty
+                callFuncsDirty: states.pickCallFuncsDirty                               // (Re)generate functions if dirty
+            });
 
-        this._renderDrawList(states, true, params.tagSelector);
+            this._renderDrawList(states, true, params.tagSelector);
 
-        nodeRenderer.cleanup();                                                     // Flush render
+            nodeRenderer.cleanup();                                                     // Flush render
 
-        states.pickCallListDirty = false;                                           // Pick call list up to date
-        states.pickCallFuncsDirty = false;                                          // Pick function cache up to date
+            states.pickCallListDirty = false;                                           // Pick call list up to date
+            states.pickCallFuncsDirty = false;                                          // Pick function cache up to date
 
-        states.pickBufDirty = false;                                                // Pick buffer up to date
-        //  }
+            states.pickBufDirty = false;                                                // Pick buffer up to date
+        }
 
         var pix = pickBuf.read(canvasX, canvasY);                                       // Read pick buffer
         var pickedNodeIndex = pix[0] + pix[1] * 256 + pix[2] * 65536;
